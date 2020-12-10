@@ -26,6 +26,14 @@ class ChatScreen extends StatelessWidget {
           );
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {
+          Firestore.instance
+              .collection('chats/z9qb2vAVkRFRLmNQpyv9/messages')
+              .add({'text': 'This was added by clicking button'});
+        },
+      ),
     );
   }
 }
