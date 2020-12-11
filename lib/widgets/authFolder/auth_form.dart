@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
 class AuthForm extends StatefulWidget {
+  AuthForm(this.submitFn, this.isLoading);
+
+  final bool isLoading;
+
+  final void Function(String email, String password, String userName,
+      bool isLogin, BuildContext ctx) submitFn;
+
   @override
   _AuthFormState createState() => _AuthFormState();
 }
@@ -21,10 +28,14 @@ class _AuthFormState extends State<AuthForm> {
 
     if (isValid) {
       _formKey.currentState.save();
+      widget.submitFn(
+        _userEmail.trim(),
+        _userPassword.trim(),
+        _userName.trim(),
+        _isLogin,
+        context,
+      );
     }
-    print(_userEmail);
-    print(_userName);
-    print(_userPassword);
   }
 
   @override
@@ -41,6 +52,7 @@ class _AuthFormState extends State<AuthForm> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextFormField(
+                      key: ValueKey('email'),
                       validator: (value) {
                         if (value.isEmpty || !value.contains('@')) {
                           return 'Enter a valid email address';
@@ -57,6 +69,7 @@ class _AuthFormState extends State<AuthForm> {
                     ),
                     if (!_isLogin)
                       TextFormField(
+                        key: ValueKey('userName'),
                         validator: (value) {
                           if (value.isEmpty || value.length < 4) {
                             return 'Please enter atleast 4 characters';
@@ -69,6 +82,7 @@ class _AuthFormState extends State<AuthForm> {
                         },
                       ),
                     TextFormField(
+                      key: ValueKey('Password'),
                       validator: (value) {
                         if (value.isEmpty || value.length < 7) {
                           return 'Password must be atleast 7 characters long';
@@ -84,20 +98,23 @@ class _AuthFormState extends State<AuthForm> {
                     SizedBox(
                       height: 12,
                     ),
-                    RaisedButton(
-                        child: Text(_isLogin ? 'Login' : 'SignUp'),
-                        onPressed: _trySubmit),
-                    FlatButton(
-                      textColor: Theme.of(context).primaryColor,
-                      child: Text(_isLogin
-                          ? 'Create new account'
-                          : 'I already have an account'),
-                      onPressed: () {
-                        setState(() {
-                          _isLogin = !_isLogin;
-                        });
-                      },
-                    )
+                    if (widget.isLoading) CircularProgressIndicator(),
+                    if (!widget.isLoading)
+                      RaisedButton(
+                          child: Text(_isLogin ? 'Login' : 'SignUp'),
+                          onPressed: _trySubmit),
+                    if (!widget.isLoading)
+                      FlatButton(
+                        textColor: Theme.of(context).primaryColor,
+                        child: Text(_isLogin
+                            ? 'Create new account'
+                            : 'I already have an account'),
+                        onPressed: () {
+                          setState(() {
+                            _isLogin = !_isLogin;
+                          });
+                        },
+                      )
                   ],
                 )),
           ),
